@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:audioplayers/audioplayers.dart';
-import 'package:vibration/vibration.dart';
 import 'dart:math';
 import '../../core/theme/app_colors.dart';
 
@@ -18,38 +16,19 @@ class _KiaraUnlockAnimationState extends State<KiaraUnlockAnimation>
     with SingleTickerProviderStateMixin {
 
   late AnimationController _controller;
-  final player = AudioPlayer();
 
   @override
-void initState() {
-  super.initState();
-  loadData();
-}
-
-Future<void> loadData() async {
-  try {
-    final data = await _apiService.getHomeData(token);
-    setState(() {
-      homeData = data;
-      isLoading = false;
-    });
-  } catch (e) {
-    print(e);
-  }
-}
-
-  void _playEffects() async {
-    if (await Vibration.hasVibrator() ?? false) {
-      Vibration.vibrate(duration: 200);
-    }
-
-    await player.play(AssetSource('sounds/reward.mp3'));
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 900),
+    )..repeat(reverse: true);
   }
 
   @override
   void dispose() {
     _controller.dispose();
-    player.dispose();
     super.dispose();
   }
 
@@ -101,7 +80,7 @@ Future<void> loadData() async {
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       color: AppColors.primary
-                          .withOpacity(0.2 * (1 - _controller.value)),
+                          .withValues(alpha: 0.2 * (1 - _controller.value)),
                     ),
                   ),
 

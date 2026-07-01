@@ -1,0 +1,32 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+venv/
+.venv/
+env/
+
+# Banco local (nunca subir)
+*.db
+*.sqlite
+*.sqlite3
+
+# Variáveis de ambiente
+.env
+.env.*
+!.env.example
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# Flutter build
+frontend_app/.dart_tool/
+frontend_app/build/
+frontend_app/.flutter-plugins
+frontend_app/.flutter-plugins-dependencies
+
+# Keystore Android (NUNCA subir)
+*.jks
+*.keystore

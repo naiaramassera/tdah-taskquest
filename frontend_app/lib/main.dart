@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'core/theme/app_theme.dart';
-import 'presentation/screens/dashboard_screen.dart';
+import 'presentation/screens/auth_gate.dart';
 
 
 void main() {
@@ -15,7 +15,7 @@ class TaskQuestApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: AppTheme.darkTheme,
-      home: const DashboardScreen(),
+      home: const AuthGate(),
     );
   }
 }

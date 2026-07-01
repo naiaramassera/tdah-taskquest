@@ -27,5 +27,5 @@ def unlock_level_skins(user, db):
     return unlocked_skins
 
 
-def unlock_achievement_skins():
-    return None
+def unlock_achievement_skins(user, achievement_id, db):
+    return []

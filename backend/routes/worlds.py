@@ -4,7 +4,7 @@ from backend.database.session import get_db
 from backend.core.dependencies import get_current_user
 from backend.models.xp import XPProgress
 from backend.models.world import World
-from backend.models.user_progress import User, UserProgress
+from backend.models.user_progress import UserProgress
 
 router = APIRouter(tags=["Worlds"])
 
@@ -34,7 +34,7 @@ def get_world_map(
     current_user = Depends(get_current_user)
 ):
 
-    worlds = db.query(World).all()
+    worlds = db.query(World).filter(World.user_id == current_user.id).all()
 
     progress = db.query(UserProgress).filter(
         UserProgress.user_id == current_user.id
@@ -48,8 +48,14 @@ def get_world_map(
 
     for world in worlds:
         result.append({
-            'world': world.name,
-            'description': world.description,
-            'current_level': progress_dict.get(world.id, 1),
-            'locked': xp.level < world.required_level
+            "id": world.id,
+            "name": world.name,
+            "icon": world.icon,
+            "color": world.color,
+            "description": world.description,
+            "required_level": world.required_level,
+            "current_level": progress_dict.get(world.id, 1),
+            "locked": (xp.level if xp else 1) < world.required_level
         })
+
+    return result

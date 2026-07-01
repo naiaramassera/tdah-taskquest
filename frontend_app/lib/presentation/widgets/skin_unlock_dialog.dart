@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
-import '../../core/theme/app_colors.dart';
+import "package:flutter/material.dart" show BorderRadius, BuildContext, Column, Dialog, EdgeInsets, ElevatedButton, FontWeight, MainAxisSize, Navigator, Padding, RoundedRectangleBorder, SizedBox, StatelessWidget, Text, TextStyle, Widget;
+import '../../core/theme/app_colors.dart' show AppColors;
 
 class SkinUnlockDialog extends StatelessWidget {
   final String skinName;

@@ -24,6 +24,7 @@ class DailyTaskResponse(BaseModel):
     id: int
     title: str
     completed: bool
+    xp_reward: int
 
 
 class HomeResponse(BaseModel):
@@ -32,3 +33,4 @@ class HomeResponse(BaseModel):
     xp: XPResponse
     streak: Optional[StreakResponse]
     motivation: str
+    coins: int = 0

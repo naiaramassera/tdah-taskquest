@@ -47,4 +47,4 @@ def unlock(user, achievement, db):
     unlock_achievement_skins(user, achievement.id, db)
 
     # Dá XP bônus
-    add_xp(achievement.xp_reward, user)
+    add_xp(user, achievement.xp_reward, db)

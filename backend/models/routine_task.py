@@ -10,8 +10,12 @@ class RoutineTask(Base):
 
     world_id = Column(Integer, ForeignKey("worlds.id"))
     title = Column(String, nullable=False)
+    description = Column(String, nullable=True)
 
-    difficulty = Column(Integer, default=1)  # 1 a 3
+    difficulty = Column(Integer, default=1)  # 1=leve, 2=média, 3=difícil
     is_active = Column(Boolean, default=True)
+    time_limit_minutes = Column(Integer, nullable=True)  # tempo limite em minutos
+    coin_reward = Column(Integer, default=10)
+    xp_reward = Column(Integer, default=15)
 
     world = relationship("World")

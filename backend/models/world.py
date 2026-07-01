@@ -10,9 +10,10 @@ class World(Base):
     user_id = Column(Integer, ForeignKey("users.id"))
 
     name = Column(String, nullable=False)
-    icon = Column(String, nullable=True)  # emoji ou nome de ícone
+    icon = Column(String, nullable=True)
     color = Column(String, nullable=True)
     description = Column(String)
     required_level = Column(Integer, default=1)
+    world_type = Column(String, default="custom")  # personal, professional, custom
 
     user = relationship("User")
