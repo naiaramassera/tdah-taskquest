@@ -107,8 +107,8 @@ class _KiaraAuraPainter extends CustomPainter {
     final glowPaint = Paint()
       ..shader = RadialGradient(
         colors: [
-          const Color(0xFF00F5D4).withValues(alpha: 0.22 + pulse * 0.10),
-          const Color(0xFFFFD166).withValues(alpha: 0.08),
+          const Color(0xFF4ADE80).withValues(alpha: 0.22 + pulse * 0.10),
+          const Color(0xFFB39DFF).withValues(alpha: 0.08),
           Colors.transparent,
         ],
       ).createShader(Rect.fromCircle(
@@ -121,7 +121,7 @@ class _KiaraAuraPainter extends CustomPainter {
     final orbitPaint = Paint()
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1.2
-      ..color = const Color(0xFF00F5D4).withValues(alpha: compact ? 0.14 : 0.24);
+      ..color = const Color(0xFFB39DFF).withValues(alpha: compact ? 0.14 : 0.24);
 
     if (!compact) {
       canvas.drawOval(
@@ -146,7 +146,7 @@ class _KiaraAuraPainter extends CustomPainter {
       );
       final brightness = 0.45 + math.sin(phase) * 0.35;
       particlePaint.color = (i.isEven
-              ? const Color(0xFF00F5D4)
+              ? const Color(0xFF4ADE80)
               : const Color(0xFFFFD166))
           .withValues(alpha: brightness.clamp(0.18, 0.8));
       canvas.drawCircle(position, compact ? 2.0 : 3.2, particlePaint);

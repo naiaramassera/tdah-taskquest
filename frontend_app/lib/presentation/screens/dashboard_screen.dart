@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -378,7 +379,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       appBar: AppBar(
         title: Row(
           children: [
-            const Text('TaskQuest'),
+            const Text('TaskQuest 🎮'),
             if (_myProfession != null) ...[
               const SizedBox(width: 8),
               Text(
@@ -414,11 +415,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
         selectedIndex: _tabIndex,
         onDestinationSelected: (index) => setState(() => _tabIndex = index),
         destinations: const [
-          NavigationDestination(icon: Icon(Icons.home_outlined), label: 'Hoje'),
-          NavigationDestination(icon: Icon(Icons.public), label: 'Mundos'),
-          NavigationDestination(icon: Icon(Icons.flag_outlined), label: 'Missões'),
-          NavigationDestination(icon: Icon(Icons.timer_outlined), label: 'Foco'),
-          NavigationDestination(icon: Icon(Icons.storefront), label: 'Loja'),
+          NavigationDestination(icon: Icon(Icons.home_rounded), label: 'Home'),
+          NavigationDestination(icon: Icon(Icons.public_rounded), label: 'Mundos'),
+          NavigationDestination(icon: Icon(Icons.menu_book_rounded), label: 'Missões'),
+          NavigationDestination(icon: Icon(Icons.timer_rounded), label: 'Foco'),
+          NavigationDestination(icon: Icon(Icons.shopping_bag_rounded), label: 'Loja'),
         ],
       ),
     );
@@ -434,112 +435,131 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final currentXp = xp['current_level_xp'] as int? ?? 0;
     final nextXp = xp['next_level_xp'] as int? ?? 100;
     final progress = nextXp == 0 ? 0.0 : (currentXp / nextXp).clamp(0.0, 1.0);
+    final daily = _missions['daily'] as List<dynamic>? ?? [];
+    final weekly = _missions['weekly'] as List<dynamic>? ?? [];
+    final dailyMission = daily.isNotEmpty ? daily.first as Map<String, dynamic> : null;
+    final weeklyMission = weekly.isNotEmpty ? weekly.first as Map<String, dynamic> : null;
 
     return RefreshIndicator(
       onRefresh: _loadAll,
       child: ListView(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
         children: [
-          // Kiara card
-          Container(
-            padding: const EdgeInsets.all(18),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: AppColors.border),
-              gradient: const LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [Color(0xFF12192C), Color(0xFF0E1526), Color(0xFF080B14)],
-              ),
+          Text(
+            'Bem-vinda de volta, heroína ✨',
+            style: GoogleFonts.baloo2(
+              fontSize: 22,
+              fontWeight: FontWeight.w800,
+              color: AppColors.textPrimary,
             ),
-            child: Row(
+          ),
+          const SizedBox(height: 4),
+          // Mascote + balão de fala
+          SizedBox(
+            height: 250,
+            child: Stack(
               children: [
-                const Expanded(flex: 11, child: AnimatedKiara(size: 210)),
-                const SizedBox(width: 12),
-                Expanded(
-                  flex: 9,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'BEM-VINDA\nDE VOLTA!',
-                        style: GoogleFonts.orbitron(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w900,
-                          color: AppColors.primary,
-                          letterSpacing: 1,
-                          height: 1.3,
-                          shadows: [Shadow(color: AppColors.primary.withValues(alpha: 0.5), blurRadius: 10)],
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      Container(
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          color: AppColors.surface.withValues(alpha: 0.72),
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(color: AppColors.border),
-                        ),
-                        child: Text(
-                          home['motivation'] as String? ?? 'Um passo por vez.',
-                          style: const TextStyle(height: 1.35, fontSize: 13),
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      _statCard('Nível', '${xp['level'] ?? 1}', Icons.trending_up),
-                    ],
+                const Align(
+                  alignment: Alignment.bottomLeft,
+                  child: AnimatedKiara(size: 225),
+                ),
+                Positioned(
+                  right: 0,
+                  top: 28,
+                  child: _speechBubble(
+                    home['motivation'] as String? ??
+                        'Pequenos passos ainda são progresso 🌱',
                   ),
                 ),
               ],
             ),
           ),
-          const SizedBox(height: 12),
-          // Stats row
+          const SizedBox(height: 16),
           Row(
             children: [
+              Expanded(child: _statCard('Nível', '${xp['level'] ?? 1}', Icons.trending_up)),
+              const SizedBox(width: 8),
               Expanded(child: _statCard('Sequência', '${streak['current_streak'] ?? 0} dias', Icons.local_fire_department)),
               const SizedBox(width: 8),
               Expanded(child: _statCard('Moedas', '${home['coins'] ?? 0} 🪙', Icons.monetization_on_outlined)),
             ],
           ),
-          const SizedBox(height: 12),
-          // XP bar
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(14),
-              child: Column(
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text('// XP', style: GoogleFonts.orbitron(fontSize: 11, fontWeight: FontWeight.w700, color: AppColors.primary, letterSpacing: 1.5)),
-                      Text('$currentXp / $nextXp', style: GoogleFonts.shareTechMono(color: AppColors.textSecondary, fontSize: 12)),
-                    ],
-                  ),
-                  const SizedBox(height: 10),
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(999),
-                    child: LinearProgressIndicator(
-                      value: progress,
-                      minHeight: 14,
-                      backgroundColor: AppColors.background,
-                      color: AppColors.primary,
+          const SizedBox(height: 20),
+          Text('Seu XP', style: _sectionTitleStyle()),
+          const SizedBox(height: 10),
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: _panelDecoration(),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Stack(
+                  alignment: Alignment.centerRight,
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(999),
+                      child: LinearProgressIndicator(
+                        value: progress,
+                        minHeight: 22,
+                        backgroundColor: AppColors.backgroundDeep,
+                        color: AppColors.xp,
+                      ),
                     ),
+                    Padding(
+                      padding: const EdgeInsets.only(right: 10),
+                      child: Text(
+                        '$currentXp / $nextXp',
+                        style: GoogleFonts.nunito(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w800,
+                          color: AppColors.textPrimary,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  '$currentXp / $nextXp XP',
+                  style: GoogleFonts.nunito(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w800,
+                    color: AppColors.xp,
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
           const SizedBox(height: 20),
-          // Daily tasks
+          Text('Missões', style: _sectionTitleStyle()),
+          const SizedBox(height: 10),
+          _missionHomeCard(
+            emoji: '🏆',
+            title: 'Missão Diária',
+            subtitle: dailyMission?['name'] as String? ?? 'Completar uma tarefa',
+            progress: dailyMission != null ? (dailyMission['percentage'] as int? ?? 0) / 100 : 0.0,
+            progressLabel: dailyMission != null
+                ? '${dailyMission['progress']} / ${dailyMission['goal']}'
+                : '0 / 1',
+            buttonLabel: 'Ir para Missões',
+            onTap: () => setState(() => _tabIndex = 2),
+          ),
+          const SizedBox(height: 12),
+          _missionHomeCard(
+            emoji: '🎁',
+            title: 'Missão da Semana',
+            subtitle: weeklyMission?['name'] as String? ?? 'Concluir tarefas nesta semana',
+            progress: weeklyMission != null ? (weeklyMission['percentage'] as int? ?? 0) / 100 : 0.0,
+            progressLabel: weeklyMission != null
+                ? '${weeklyMission['progress']} / ${weeklyMission['goal']}'
+                : '0 / 8',
+            buttonLabel: 'Ver desafios',
+            onTap: () => setState(() => _tabIndex = 2),
+          ),
+          const SizedBox(height: 20),
           Row(
             children: [
-              Expanded(
-                child: Text(
-                  '// TAREFAS DE HOJE',
-                  style: GoogleFonts.orbitron(fontSize: 13, fontWeight: FontWeight.w700, color: AppColors.primary, letterSpacing: 1.5),
-                ),
-              ),
+              Expanded(child: Text('Tarefas de hoje', style: _sectionTitleStyle())),
               TextButton.icon(
                 onPressed: () => _runAction(() => _apiService.generateDailyTasks(widget.token)),
                 icon: const Icon(Icons.auto_awesome),
@@ -552,6 +572,171 @@ class _DashboardScreenState extends State<DashboardScreen> {
           else
             ...tasks.map((task) => _taskTile(task as Map<String, dynamic>)),
         ],
+      ),
+    );
+  }
+
+  TextStyle _sectionTitleStyle() {
+    return GoogleFonts.baloo2(
+      fontSize: 20,
+      fontWeight: FontWeight.w800,
+      color: AppColors.textPrimary,
+    );
+  }
+
+  BoxDecoration _panelDecoration() {
+    return BoxDecoration(
+      color: AppColors.surface.withValues(alpha: 0.7),
+      borderRadius: BorderRadius.circular(20),
+      border: Border.all(color: AppColors.border.withValues(alpha: 0.6)),
+    );
+  }
+
+  Widget _speechBubble(String text) {
+    return Container(
+      constraints: const BoxConstraints(maxWidth: 185),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      decoration: BoxDecoration(
+        color: const Color(0xFF2F2158).withValues(alpha: 0.92),
+        borderRadius: const BorderRadius.only(
+          topLeft: Radius.circular(18),
+          topRight: Radius.circular(18),
+          bottomRight: Radius.circular(18),
+          bottomLeft: Radius.circular(4),
+        ),
+        border: Border.all(color: AppColors.border.withValues(alpha: 0.8)),
+      ),
+      child: Text(
+        text,
+        style: GoogleFonts.nunito(
+          fontSize: 14,
+          height: 1.35,
+          color: AppColors.textPrimary,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+    );
+  }
+
+  Widget _missionHomeCard({
+    required String emoji,
+    required String title,
+    required String subtitle,
+    required double progress,
+    required String progressLabel,
+    required String buttonLabel,
+    required VoidCallback onTap,
+  }) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: _panelDecoration(),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 56,
+            height: 56,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: AppColors.panel,
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Text(emoji, style: const TextStyle(fontSize: 30)),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        title,
+                        style: GoogleFonts.baloo2(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w800,
+                          color: AppColors.textPrimary,
+                        ),
+                      ),
+                    ),
+                    Text(
+                      progressLabel,
+                      style: GoogleFonts.nunito(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w800,
+                        color: AppColors.textSecondary,
+                      ),
+                    ),
+                  ],
+                ),
+                Text(subtitle, style: GoogleFonts.nunito(fontSize: 13, color: AppColors.textSecondary)),
+                const SizedBox(height: 10),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(999),
+                            child: LinearProgressIndicator(
+                              value: progress.clamp(0.0, 1.0),
+                              minHeight: 10,
+                              backgroundColor: AppColors.backgroundDeep,
+                              color: AppColors.xp,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            progressLabel,
+                            style: GoogleFonts.nunito(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w800,
+                              color: AppColors.xp,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    _pillButton(buttonLabel, onTap),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _pillButton(String label, VoidCallback onTap) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(999),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        decoration: BoxDecoration(
+          color: AppColors.backgroundDeep.withValues(alpha: 0.7),
+          borderRadius: BorderRadius.circular(999),
+          border: Border.all(color: AppColors.xp.withValues(alpha: 0.5)),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              label,
+              style: GoogleFonts.nunito(
+                fontSize: 12,
+                fontWeight: FontWeight.w800,
+                color: AppColors.xp,
+              ),
+            ),
+            const Icon(Icons.chevron_right, size: 16, color: AppColors.xp),
+          ],
+        ),
       ),
     );
   }
@@ -654,7 +839,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 children: [
                   Text(
                     title,
-                    style: GoogleFonts.orbitron(
+                    style: GoogleFonts.baloo2(
                       fontSize: 13,
                       fontWeight: FontWeight.w800,
                       color: color,
@@ -662,7 +847,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       shadows: [Shadow(color: color.withValues(alpha: 0.5), blurRadius: 8)],
                     ),
                   ),
-                  Text(subtitle, style: GoogleFonts.shareTechMono(fontSize: 11, color: color.withValues(alpha: 0.7))),
+                  Text(subtitle, style: GoogleFonts.nunito(fontSize: 11, color: color.withValues(alpha: 0.7))),
                 ],
               ),
             ),
@@ -804,7 +989,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 if (isTimerRunning)
                   Text(
                     '  ⏱ $timerLabel',
-                    style: GoogleFonts.shareTechMono(fontSize: 13, color: accentColor, fontWeight: FontWeight.w700),
+                    style: GoogleFonts.nunito(fontSize: 13, color: accentColor, fontWeight: FontWeight.w700),
                   ),
               ],
             ),
@@ -871,7 +1056,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             Expanded(
               child: Text(
                 '// MISSÕES',
-                style: GoogleFonts.orbitron(fontSize: 13, fontWeight: FontWeight.w700, color: AppColors.primary, letterSpacing: 1.5),
+                style: GoogleFonts.baloo2(fontSize: 13, fontWeight: FontWeight.w700, color: AppColors.primary, letterSpacing: 1.5),
               ),
             ),
             IconButton(
@@ -908,7 +1093,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         Text(
           '$minutes:$seconds',
           textAlign: TextAlign.center,
-          style: GoogleFonts.orbitron(
+          style: GoogleFonts.baloo2(
             fontSize: 60,
             fontWeight: FontWeight.w900,
             color: AppColors.primary,
@@ -924,7 +1109,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             label: const Text('Concluir foco'),
           ),
         const SizedBox(height: 24),
-        Text('// SELECIONE O ALVO', style: GoogleFonts.orbitron(fontSize: 11, fontWeight: FontWeight.w700, color: AppColors.primary, letterSpacing: 1.5)),
+        Text('// SELECIONE O ALVO', style: GoogleFonts.baloo2(fontSize: 11, fontWeight: FontWeight.w700, color: AppColors.primary, letterSpacing: 1.5)),
         const SizedBox(height: 12),
         if (tasks.isEmpty)
           _emptyState('Sem tarefas pendentes.', 'Gere tarefas ou conclua o dia.')
@@ -958,7 +1143,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             padding: const EdgeInsets.all(20),
             child: Column(
               children: [
-                Text('// KIARA', style: GoogleFonts.orbitron(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.primary, letterSpacing: 1.5)),
+                Text('// KIARA', style: GoogleFonts.baloo2(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.primary, letterSpacing: 1.5)),
                 const SizedBox(height: 12),
                 const AnimatedKiara(size: 140, evolved: true),
                 const SizedBox(height: 8),
@@ -1111,7 +1296,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           const SizedBox(height: 6),
           Text(
             value,
-            style: GoogleFonts.orbitron(
+            style: GoogleFonts.baloo2(
               fontWeight: FontWeight.w700,
               color: AppColors.textPrimary,
               fontSize: 13,
@@ -1164,14 +1349,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
     return Container(
       decoration: const BoxDecoration(
         gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [Color(0xFF070A12), Color(0xFF0A1320), Color(0xFF101827)],
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [Color(0xFF251549), Color(0xFF171033), Color(0xFF0E0824)],
         ),
       ),
       child: Stack(
         children: [
-          Positioned.fill(child: CustomPaint(painter: _TechGridPainter())),
+          Positioned.fill(child: CustomPaint(painter: _StarryNightPainter())),
           child,
         ],
       ),
@@ -1630,27 +1815,42 @@ class _BossDefeatPopupState extends State<_BossDefeatPopup>
   }
 }
 
-class _TechGridPainter extends CustomPainter {
+class _StarryNightPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
-    final gridPaint = Paint()
-      ..color = AppColors.primary.withValues(alpha: 0.035)
-      ..strokeWidth = 1;
+    final random = math.Random(42);
+    final starPaint = Paint()..style = PaintingStyle.fill;
 
-    const spacing = 28.0;
-    for (var x = 0.0; x < size.width; x += spacing) {
-      canvas.drawLine(Offset(x, 0), Offset(x, size.height), gridPaint);
-    }
-    for (var y = 0.0; y < size.height; y += spacing) {
-      canvas.drawLine(Offset(0, y), Offset(size.width, y), gridPaint);
+    // Estrelas pequenas espalhadas
+    for (var i = 0; i < 90; i++) {
+      final position = Offset(
+        random.nextDouble() * size.width,
+        random.nextDouble() * size.height,
+      );
+      final radius = 0.5 + random.nextDouble() * 1.3;
+      starPaint.color = Colors.white.withValues(alpha: 0.15 + random.nextDouble() * 0.45);
+      canvas.drawCircle(position, radius, starPaint);
     }
 
+    // Algumas estrelas maiores com brilho
+    for (var i = 0; i < 8; i++) {
+      final position = Offset(
+        random.nextDouble() * size.width,
+        random.nextDouble() * size.height * 0.7,
+      );
+      starPaint.color = const Color(0xFFFFE9A8).withValues(alpha: 0.7);
+      canvas.drawCircle(position, 1.8, starPaint);
+      starPaint.color = const Color(0xFFFFE9A8).withValues(alpha: 0.15);
+      canvas.drawCircle(position, 5, starPaint);
+    }
+
+    // Névoa roxa suave no topo
     final glow = Paint()
       ..shader = RadialGradient(
-        colors: [AppColors.primary.withValues(alpha: 0.12), Colors.transparent],
+        colors: [const Color(0xFF7C5CFF).withValues(alpha: 0.14), Colors.transparent],
       ).createShader(Rect.fromCircle(
-        center: Offset(size.width * 0.85, size.height * 0.08),
-        radius: size.width * 0.55,
+        center: Offset(size.width * 0.8, size.height * 0.1),
+        radius: size.width * 0.6,
       ));
     canvas.drawRect(Offset.zero & size, glow);
   }

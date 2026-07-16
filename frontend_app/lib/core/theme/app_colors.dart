@@ -1,14 +1,19 @@
 import 'package:flutter/material.dart';
 
 class AppColors {
-  static const background = Color(0xFF070A12);
-  static const surface = Color(0xFF101827);
-  static const primary = Color(0xFF00F5D4);
-  static const xp = Color(0xFF22C55E);
-  static const accent = Color(0xFFFFD166);
-  static const danger = Color(0xFFFF5C8A);
-  static const panel = Color(0xFF121A2B);
-  static const border = Color(0xFF25324A);
-  static const textPrimary = Color(0xFFF8FAFC);
-  static const textSecondary = Color(0xFFAAB7CF);
+  // Céu noturno roxo
+  static const background = Color(0xFF171033);
+  static const backgroundDeep = Color(0xFF0E0824);
+  static const surface = Color(0xFF251A4A);
+  static const panel = Color(0xFF2B1E55);
+  static const border = Color(0xFF453471);
+
+  // Acentos
+  static const primary = Color(0xFFB39DFF); // lilás
+  static const xp = Color(0xFF4ADE80); // verde do cristal
+  static const accent = Color(0xFFFFD166); // dourado
+  static const danger = Color(0xFFFF7A9C);
+
+  static const textPrimary = Color(0xFFF5F1FF);
+  static const textSecondary = Color(0xFFBCB0E0);
 }

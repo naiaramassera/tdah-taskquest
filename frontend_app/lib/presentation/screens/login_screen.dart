@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -68,17 +70,17 @@ class _LoginScreenState extends State<LoginScreen> {
     return Scaffold(
       body: Stack(
         children: [
-          // Tech grid background
+          // Céu noturno roxo
           Container(
             decoration: const BoxDecoration(
               gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [Color(0xFF040608), Color(0xFF070A12), Color(0xFF0A1320)],
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [Color(0xFF251549), Color(0xFF171033), Color(0xFF0E0824)],
               ),
             ),
           ),
-          CustomPaint(painter: _GridPainter(), size: Size.infinite),
+          CustomPaint(painter: _StarsPainter(), size: Size.infinite),
           // Glow top-right
           Positioned(
             top: -100,
@@ -105,19 +107,18 @@ class _LoginScreenState extends State<LoginScreen> {
                       const SizedBox(height: 8),
                       // Logo title
                       Text(
-                        'TASKQUEST',
-                        style: GoogleFonts.orbitron(
-                          fontSize: 28,
-                          fontWeight: FontWeight.w900,
-                          color: AppColors.primary,
-                          letterSpacing: 4,
-                          shadows: [Shadow(color: AppColors.primary.withValues(alpha: 0.6), blurRadius: 20)],
+                        'TaskQuest 🎮',
+                        style: GoogleFonts.baloo2(
+                          fontSize: 30,
+                          fontWeight: FontWeight.w800,
+                          color: AppColors.textPrimary,
+                          shadows: [Shadow(color: AppColors.primary.withValues(alpha: 0.5), blurRadius: 18)],
                         ),
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        '// sistema de foco para mentes neurodivergentes',
-                        style: GoogleFonts.shareTechMono(
+                        'Transforme sua rotina em aventura ✨',
+                        style: GoogleFonts.nunito(
                           fontSize: 11,
                           color: AppColors.textSecondary,
                           letterSpacing: 0.5,
@@ -129,8 +130,8 @@ class _LoginScreenState extends State<LoginScreen> {
                       Container(
                         padding: const EdgeInsets.all(24),
                         decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(16),
-                          color: const Color(0xFF0A0F1C),
+                          borderRadius: BorderRadius.circular(20),
+                          color: AppColors.surface.withValues(alpha: 0.75),
                           border: Border.all(color: AppColors.border),
                           boxShadow: [
                             BoxShadow(
@@ -144,11 +145,11 @@ class _LoginScreenState extends State<LoginScreen> {
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
                             Text(
-                              '> ACESSO AO SISTEMA',
-                              style: GoogleFonts.shareTechMono(
-                                fontSize: 11,
-                                color: AppColors.primary.withValues(alpha: 0.6),
-                                letterSpacing: 1,
+                              'Bem-vinda de volta!',
+                              style: GoogleFonts.baloo2(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w700,
+                                color: AppColors.textPrimary,
                               ),
                             ),
                             const SizedBox(height: 16),
@@ -180,7 +181,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 ),
                                 child: Text(
                                   _error!,
-                                  style: GoogleFonts.shareTechMono(color: AppColors.danger, fontSize: 12),
+                                  style: GoogleFonts.nunito(color: AppColors.danger, fontSize: 12),
                                 ),
                               ),
                             ],
@@ -209,18 +210,31 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 }
 
-class _GridPainter extends CustomPainter {
+class _StarsPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = AppColors.primary.withValues(alpha: 0.03)
-      ..strokeWidth = 1;
-    const step = 30.0;
-    for (var x = 0.0; x < size.width; x += step) {
-      canvas.drawLine(Offset(x, 0), Offset(x, size.height), paint);
+    final random = math.Random(7);
+    final paint = Paint()..style = PaintingStyle.fill;
+
+    for (var i = 0; i < 80; i++) {
+      final position = Offset(
+        random.nextDouble() * size.width,
+        random.nextDouble() * size.height,
+      );
+      final radius = 0.5 + random.nextDouble() * 1.3;
+      paint.color = Colors.white.withValues(alpha: 0.15 + random.nextDouble() * 0.45);
+      canvas.drawCircle(position, radius, paint);
     }
-    for (var y = 0.0; y < size.height; y += step) {
-      canvas.drawLine(Offset(0, y), Offset(size.width, y), paint);
+
+    for (var i = 0; i < 6; i++) {
+      final position = Offset(
+        random.nextDouble() * size.width,
+        random.nextDouble() * size.height * 0.6,
+      );
+      paint.color = const Color(0xFFFFE9A8).withValues(alpha: 0.7);
+      canvas.drawCircle(position, 1.8, paint);
+      paint.color = const Color(0xFFFFE9A8).withValues(alpha: 0.15);
+      canvas.drawCircle(position, 5, paint);
     }
   }
 
