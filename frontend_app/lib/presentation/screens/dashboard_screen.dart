@@ -367,13 +367,20 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final pages = [
-      _buildHome(),
-      _buildWorlds(),
-      _buildMissions(),
-      _buildFocus(),
-      _buildStore(),
-    ];
+    final Widget body;
+    if (_loading) {
+      body = const Center(child: CircularProgressIndicator());
+    } else if (_error != null || _home == null) {
+      body = _buildError();
+    } else {
+      body = [
+        _buildHome(),
+        _buildWorlds(),
+        _buildMissions(),
+        _buildFocus(),
+        _buildStore(),
+      ][_tabIndex];
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -404,13 +411,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           IconButton(tooltip: 'Sair', onPressed: _logout, icon: const Icon(Icons.logout)),
         ],
       ),
-      body: _techSurface(
-        _loading
-            ? const Center(child: CircularProgressIndicator())
-            : _error != null
-                ? _buildError()
-                : pages[_tabIndex],
-      ),
+      body: _techSurface(body),
       bottomNavigationBar: NavigationBar(
         selectedIndex: _tabIndex,
         onDestinationSelected: (index) => setState(() => _tabIndex = index),
